@@ -1,9 +1,11 @@
 package com.coded.bankingproject.domain.entities
 
+
 import com.fasterxml.jackson.annotation.JsonBackReference
 import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
 import java.math.BigDecimal
+import java.util.UUID
 
 @Entity
 @Table(name = "accounts")
@@ -13,7 +15,10 @@ data class AccountEntity(
     @Column(name = "id")
     val id: Long? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "name")
+    val name: String,
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     @JsonBackReference
     val user: UserEntity? = null,
@@ -25,9 +30,9 @@ data class AccountEntity(
     val isActive: Boolean,
 
     @Column(name="account_number", unique = true)
-    val accountNumber: String,
+    val accountNumber: String = UUID.randomUUID().toString(),
 
 
 ) {
-    constructor(): this(null, null, BigDecimal.ZERO, false, "")
+    constructor(): this(null, "", null, BigDecimal.ZERO, false, "")
 }

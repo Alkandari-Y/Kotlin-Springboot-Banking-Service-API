@@ -11,3 +11,5 @@ interface AccountRepository: JpaRepository<AccountEntity, Long> {
     @Query("SELECT a FROM AccountEntity a")
     fun allAccounts(): List<AccountListItemProjection>
 }
+
+// name entity graphy n + 1 entity queries

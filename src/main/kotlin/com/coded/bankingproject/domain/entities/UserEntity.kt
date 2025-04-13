@@ -16,13 +16,7 @@ data class UserEntity(
 
     @Column(name = "password", nullable = false, updatable = true)
     val password: String,
-//
-//    @OneToOne(mappedBy = "user")
-//    val kyc: KYCEntity? = null
 
-//    @OneToMany(mappedBy = "user", cascade = [CascadeType.DETACH], fetch = FetchType.LAZY)
-//    @JsonManagedReference
-//    val accounts: List<AccountEntity> = listOf(),
 ) {
     constructor() : this(null, "", "")
 }

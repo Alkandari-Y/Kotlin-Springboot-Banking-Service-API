@@ -6,6 +6,7 @@ interface AccountListItemProjection {
     val user: UserBaseProjection
     val id: Long
     val balance: BigDecimal
-    val is_active: Boolean
-    val account_number: String
+    val isActive: Boolean
+    val accountNumber: String
+    val name: String
 }
