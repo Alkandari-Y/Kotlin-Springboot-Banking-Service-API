@@ -16,4 +16,12 @@ class AccountServiceImpl(
     override fun createAccount(accountEntity: AccountEntity): AccountEntity {
         return accountRepository.save(accountEntity)
     }
+
+    override fun closeAccount(accountNumber: String) {
+        accountRepository.findByAccountNumber(accountNumber)?.apply {
+            if (this.isActive) {
+                accountRepository.save(this.copy(isActive = false))
+            }
+        }
+    }
 }

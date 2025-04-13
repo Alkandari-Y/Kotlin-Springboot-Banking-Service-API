@@ -20,6 +20,7 @@ CREATE TABLE "kycs" (
 DROP TABLE IF EXISTS accounts;
 CREATE TABLE "accounts" (
     "id" SERIAL PRIMARY KEY,
+    "name" VARCHAR(255) NOT NULL,
     "user_id" INT REFERENCES users(id) NOT NULL,
     "balance" DECIMAL(9, 3) NOT NULL,
     "is_active" BOOLEAN DEFAULT TRUE,

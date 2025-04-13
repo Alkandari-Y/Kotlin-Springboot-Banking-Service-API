@@ -8,11 +8,7 @@ import com.coded.bankingproject.services.AccountService
 import com.coded.bankingproject.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/accounts/v1")
@@ -34,5 +30,10 @@ class AccountsControllers(
 
         val account = accountService.createAccount(accountCreateRequestDto.toEntity(user))
         return ResponseEntity(account, HttpStatus.CREATED)
+    }
+
+    @PostMapping(path=["/accounts/{accountNumber}/close"])
+    fun closeAccount(@PathVariable accountNumber : String) {
+        accountService.closeAccount(accountNumber)
     }
 }
