@@ -13,10 +13,12 @@ data class TransactionEntity(
     val id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "source_account", nullable = false)
     @JsonBackReference
     val sourceAccount: AccountEntity?,
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "destination_account", nullable = false)
     @JsonBackReference
     val destinationAccount: AccountEntity?,
 

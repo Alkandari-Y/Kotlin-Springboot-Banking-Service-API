@@ -30,7 +30,7 @@ CREATE TABLE "accounts" (
 DROP TABLE IF EXISTS transactions;
 CREATE TABLE "transactions" (
     "id" SERIAL PRIMARY KEY,
-    "source_account" INT REFERENCES accounts(id),
-    "destination_account" INT REFERENCES accounts(id),
-    "amount" DECIMAL(9, 3)
+    "source_account" INT REFERENCES accounts(id) NOT NULL,
+    "destination_account" INT REFERENCES accounts(id) NOT NULL,
+    "amount" DECIMAL(9, 3) NOT NULL
 )

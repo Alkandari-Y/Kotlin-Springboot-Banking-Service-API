@@ -1,26 +1,27 @@
 package com.coded.bankingproject.accounts
 
-import com.coded.bankingproject.accounts.dtos.AccountCreateRequestDto
-import com.coded.bankingproject.accounts.dtos.toEntity
+import com.coded.bankingproject.accounts.dtos.*
 import com.coded.bankingproject.domain.entities.AccountEntity
-import com.coded.bankingproject.repository.AccountRepository
 import com.coded.bankingproject.services.AccountService
+import com.coded.bankingproject.services.TransactionService
 import com.coded.bankingproject.services.UserService
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/accounts/v1")
+@RequestMapping("/accounts/v1/accounts")
 class AccountsControllers(
     private val accountService: AccountService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val transactionService: TransactionService
 ) {
 
-    @GetMapping(path = ["/accounts"])
+    @GetMapping
     fun getAllAccounts() = accountService.getAllAccounts()
 
-    @PostMapping(path=["/accounts"])
+    @PostMapping
     fun createAccount(
         @RequestBody accountCreateRequestDto : AccountCreateRequestDto
     ) : ResponseEntity<AccountEntity>
@@ -32,7 +33,16 @@ class AccountsControllers(
         return ResponseEntity(account, HttpStatus.CREATED)
     }
 
-    @PostMapping(path=["/accounts/{accountNumber}/close"])
+
+    @PostMapping(path=["/transfer"])
+    fun transfer(
+        @RequestBody @Valid transferCreateRequestDto: TransferCreateRequestDto
+    ): ResponseEntity<UpdatedBalanceResponse> {
+        val result = transactionService.transfer(transferCreateRequestDto)
+        return ResponseEntity(result.toUpdatedBalanceResponse(), HttpStatus.OK)
+    }
+
+    @PostMapping(path=["/{accountNumber}/close"])
     fun closeAccount(@PathVariable accountNumber : String) {
         accountService.closeAccount(accountNumber)
     }
