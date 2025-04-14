@@ -5,7 +5,6 @@ import com.coded.bankingproject.domain.entities.UserEntity
 import jakarta.validation.constraints.DecimalMin
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Positive
-import jakarta.validation.constraints.PositiveOrZero
 import org.springframework.format.annotation.DateTimeFormat
 import java.math.BigDecimal
 import java.time.LocalDate

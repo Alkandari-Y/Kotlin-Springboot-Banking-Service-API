@@ -1,17 +1,11 @@
 package com.coded.bankingproject.users
 
-import com.coded.bankingproject.domain.entities.KYCEntity
 import com.coded.bankingproject.services.KYCService
 import com.coded.bankingproject.services.UserService
-import com.coded.bankingproject.users.dtos.KYCCreateRequestDto
-import com.coded.bankingproject.users.dtos.RegisterCreateRequestDto
-import com.coded.bankingproject.users.dtos.toEntity
+import com.coded.bankingproject.users.dtos.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/users/v1")
@@ -35,5 +29,14 @@ class UserController(
     fun updateKYC(@RequestBody kycCreateRequest: KYCCreateRequestDto): KYCCreateRequestDto {
         kycService.createKYC(kycCreateRequest)
         return kycCreateRequest
+    }
+
+    @GetMapping(path=["/kyc/{userId}"])
+    fun getKYCByUserId(
+        @PathVariable("userId") userId: Long
+    ): ResponseEntity<KYCResponseDto> {
+        val kyc = kycService.findKYCByUserId(userId)
+            ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+        return ResponseEntity(kyc, HttpStatus.OK)
     }
 }
