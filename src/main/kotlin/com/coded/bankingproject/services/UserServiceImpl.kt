@@ -1,7 +1,7 @@
 package com.coded.bankingproject.services
 
 import com.coded.bankingproject.domain.entities.UserEntity
-import com.coded.bankingproject.repository.UserRepository
+import com.coded.bankingproject.repositories.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 

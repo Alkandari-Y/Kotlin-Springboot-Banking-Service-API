@@ -6,8 +6,8 @@ import com.coded.bankingproject.accounts.exceptions.AccountNotFoundException
 import com.coded.bankingproject.accounts.exceptions.IllegalTransferException
 import com.coded.bankingproject.accounts.exceptions.InsufficientFundsException
 import com.coded.bankingproject.domain.entities.TransactionEntity
-import com.coded.bankingproject.repository.AccountRepository
-import com.coded.bankingproject.repository.TransactionRepository
+import com.coded.bankingproject.repositories.AccountRepository
+import com.coded.bankingproject.repositories.TransactionRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.math.BigDecimal

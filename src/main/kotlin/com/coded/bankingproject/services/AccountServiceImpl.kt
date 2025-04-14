@@ -2,7 +2,7 @@ package com.coded.bankingproject.services
 
 import com.coded.bankingproject.domain.entities.AccountEntity
 import com.coded.bankingproject.domain.projections.AccountListItemProjection
-import com.coded.bankingproject.repository.AccountRepository
+import com.coded.bankingproject.repositories.AccountRepository
 import org.springframework.stereotype.Service
 
 @Service

@@ -1,4 +1,4 @@
-package com.coded.bankingproject.repository
+package com.coded.bankingproject.repositories
 
 import com.coded.bankingproject.domain.entities.UserEntity
 import org.springframework.data.jpa.repository.JpaRepository

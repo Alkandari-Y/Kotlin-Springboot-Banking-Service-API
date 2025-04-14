@@ -1,4 +1,4 @@
-package com.coded.bankingproject.repository
+package com.coded.bankingproject.repositories
 
 import com.coded.bankingproject.domain.entities.KYCEntity
 import com.coded.bankingproject.users.dtos.KYCResponseDto

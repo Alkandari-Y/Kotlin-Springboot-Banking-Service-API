@@ -1,8 +1,8 @@
 package com.coded.bankingproject.services
 
 import com.coded.bankingproject.domain.entities.KYCEntity
-import com.coded.bankingproject.repository.KYCRepository
-import com.coded.bankingproject.repository.UserRepository
+import com.coded.bankingproject.repositories.KYCRepository
+import com.coded.bankingproject.repositories.UserRepository
 import com.coded.bankingproject.users.dtos.KYCCreateRequestDto
 import com.coded.bankingproject.users.dtos.KYCResponseDto
 import com.coded.bankingproject.users.dtos.toEntity
