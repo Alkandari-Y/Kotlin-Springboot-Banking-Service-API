@@ -10,6 +10,12 @@ class UserServiceImpl(
     private val userRepository: UserRepository
 ): UserService {
     override fun createUser(user: UserEntity) {
+        val usernameExists = userRepository.findByUsername(user.username)
+
+        if (usernameExists != null) {
+            throw IllegalArgumentException("Username already exists")
+        }
+
         userRepository.save(user)
     }
 

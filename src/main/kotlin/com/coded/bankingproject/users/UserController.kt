@@ -3,6 +3,7 @@ package com.coded.bankingproject.users
 import com.coded.bankingproject.services.KYCService
 import com.coded.bankingproject.services.UserService
 import com.coded.bankingproject.users.dtos.*
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -15,20 +16,25 @@ class UserController(
 ) {
 
     @PostMapping(path=["/register"])
-    fun register(@RequestBody requestDto: RegisterCreateRequestDto): ResponseEntity<Nothing> {
+    fun register(@RequestBody @Valid requestDto: RegisterCreateRequestDto): ResponseEntity<Nothing> {
         return try {
             userService.createUser(requestDto.toEntity())
             ResponseEntity(null, HttpStatus.OK)
         } catch (e: Exception) {
-            println(e)
             ResponseEntity(null, HttpStatus.BAD_REQUEST)
         }
     }
 
     @PostMapping(path=["/kyc"])
-    fun updateKYC(@RequestBody kycCreateRequest: KYCCreateRequestDto): KYCCreateRequestDto {
-        kycService.createKYC(kycCreateRequest)
-        return kycCreateRequest
+    fun updateKYC(
+        @RequestBody @Valid kycCreateRequest: KYCCreateRequestDto
+    ): ResponseEntity<KYCCreateRequestDto> {
+        return try {
+            kycService.createKYC(kycCreateRequest)
+            ResponseEntity(kycCreateRequest, HttpStatus.CREATED)
+        }  catch (e: Exception) {
+            ResponseEntity(null, HttpStatus.BAD_REQUEST)
+        }
     }
 
     @GetMapping(path=["/kyc/{userId}"])

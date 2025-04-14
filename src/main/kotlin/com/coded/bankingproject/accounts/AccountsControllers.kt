@@ -23,11 +23,11 @@ class AccountsControllers(
 
     @PostMapping
     fun createAccount(
-        @RequestBody accountCreateRequestDto : AccountCreateRequestDto
+        @RequestBody @Valid accountCreateRequestDto : AccountCreateRequestDto
     ) : ResponseEntity<AccountEntity>
     {
         val user = userService.findUserById(accountCreateRequestDto.userId)
-            ?: return ResponseEntity(null, HttpStatus.OK)
+            ?: return ResponseEntity(null, HttpStatus.BAD_REQUEST)
 
         val account = accountService.createAccount(accountCreateRequestDto.toEntity(user))
         return ResponseEntity(account, HttpStatus.CREATED)
