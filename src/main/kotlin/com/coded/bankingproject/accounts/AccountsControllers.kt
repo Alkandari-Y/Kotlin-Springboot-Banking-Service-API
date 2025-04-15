@@ -34,7 +34,7 @@ class AccountsControllers(
             val account = accountService.createAccount(accountCreateRequestDto.toEntity(user))
             ResponseEntity(account, HttpStatus.CREATED)
         } catch (e: AccountLimitException) {
-            ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
+            ResponseEntity(e.code, HttpStatus.BAD_REQUEST)
         }
     }
 

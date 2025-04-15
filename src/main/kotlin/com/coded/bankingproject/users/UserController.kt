@@ -30,7 +30,7 @@ class UserController(
         @Valid @RequestBody kycCreateRequestDto: KYCCreateRequestDto
     ): ResponseEntity<KYCCreateRequestDto> {
         return try {
-            kycService.createKYC(kycCreateRequestDto)
+            kycService.createKYCOrUpdate(kycCreateRequestDto)
             ResponseEntity(kycCreateRequestDto, HttpStatus.CREATED)
         }  catch (e: Exception) {
             ResponseEntity(null, HttpStatus.BAD_REQUEST)

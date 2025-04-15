@@ -2,6 +2,7 @@ package com.coded.bankingproject.users.dtos
 
 import com.coded.bankingproject.domain.entities.KYCEntity
 import com.coded.bankingproject.domain.entities.UserEntity
+import com.coded.bankingproject.repositories.kycDateFormatter
 import jakarta.validation.constraints.DecimalMin
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Positive
@@ -9,9 +10,6 @@ import org.jetbrains.annotations.NotNull
 import org.springframework.format.annotation.DateTimeFormat
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
-var formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 
 data class KYCCreateRequestDto(
     @field:NotNull
@@ -35,7 +33,7 @@ fun KYCCreateRequestDto.toEntity(user: UserEntity) = KYCEntity(
     user = user,
     firstName = firstName,
     lastName = lastName,
-    dateOfBirth = LocalDate.parse(dateOfBirth, formatter),
+    dateOfBirth = LocalDate.parse(dateOfBirth, kycDateFormatter),
     salary = salary,
     nationality=nationality
 )

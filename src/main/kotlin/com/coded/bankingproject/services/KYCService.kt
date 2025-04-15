@@ -5,6 +5,6 @@ import com.coded.bankingproject.users.dtos.KYCCreateRequestDto
 import com.coded.bankingproject.users.dtos.KYCResponseDto
 
 interface KYCService {
-    fun createKYC(kycRequest: KYCCreateRequestDto): KYCEntity
+    fun createKYCOrUpdate(kycRequest: KYCCreateRequestDto): KYCEntity
     fun findKYCByUserId(userId: Long): KYCResponseDto?
 }

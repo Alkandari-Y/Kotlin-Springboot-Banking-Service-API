@@ -6,7 +6,7 @@ import com.coded.bankingproject.domain.projections.AccountListItemProjection
 import com.coded.bankingproject.repositories.AccountRepository
 import org.springframework.stereotype.Service
 
-val MAX_ACCOUNT_LIMIT = 3
+const val MAX_ACCOUNT_LIMIT = 3
 
 @Service
 class AccountServiceImpl(
