@@ -1,6 +1,7 @@
 package com.coded.bankingproject.accounts
 
 import com.coded.bankingproject.accounts.dtos.*
+import com.coded.bankingproject.accounts.exceptions.AccountLimitException
 import com.coded.bankingproject.domain.entities.AccountEntity
 import com.coded.bankingproject.services.AccountService
 import com.coded.bankingproject.services.TransactionService
@@ -24,13 +25,17 @@ class AccountsControllers(
     @PostMapping
     fun createAccount(
         @Valid @RequestBody accountCreateRequestDto : AccountCreateRequestDto
-    ) : ResponseEntity<AccountEntity>
+    ) : ResponseEntity<Any>
     {
         val user = userService.findUserById(accountCreateRequestDto.userId)
             ?: return ResponseEntity(null, HttpStatus.BAD_REQUEST)
 
-        val account = accountService.createAccount(accountCreateRequestDto.toEntity(user))
-        return ResponseEntity(account, HttpStatus.CREATED)
+        return try {
+            val account = accountService.createAccount(accountCreateRequestDto.toEntity(user))
+            ResponseEntity(account, HttpStatus.CREATED)
+        } catch (e: AccountLimitException) {
+            ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
+        }
     }
 
 
