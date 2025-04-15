@@ -23,7 +23,7 @@ class AccountsControllers(
 
     @PostMapping
     fun createAccount(
-        @RequestBody @Valid accountCreateRequestDto : AccountCreateRequestDto
+        @Valid @RequestBody accountCreateRequestDto : AccountCreateRequestDto
     ) : ResponseEntity<AccountEntity>
     {
         val user = userService.findUserById(accountCreateRequestDto.userId)
@@ -36,7 +36,7 @@ class AccountsControllers(
 
     @PostMapping(path=["/transfer"])
     fun transfer(
-        @RequestBody @Valid transferCreateRequestDto: TransferCreateRequestDto
+        @Valid @RequestBody transferCreateRequestDto: TransferCreateRequestDto
     ): ResponseEntity<UpdatedBalanceResponse> {
         val result = transactionService.transfer(transferCreateRequestDto)
         return ResponseEntity(result.toUpdatedBalanceResponse(), HttpStatus.OK)

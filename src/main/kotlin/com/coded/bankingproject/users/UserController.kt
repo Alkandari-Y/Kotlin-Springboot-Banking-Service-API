@@ -16,9 +16,9 @@ class UserController(
 ) {
 
     @PostMapping(path=["/register"])
-    fun register(@RequestBody @Valid requestDto: RegisterCreateRequestDto): ResponseEntity<Nothing> {
+    fun register(@Valid @RequestBody registerRequestDto: RegisterCreateRequestDto): ResponseEntity<Nothing> {
         return try {
-            userService.createUser(requestDto.toEntity())
+            userService.createUser(registerRequestDto.toEntity())
             ResponseEntity(null, HttpStatus.OK)
         } catch (e: Exception) {
             ResponseEntity(null, HttpStatus.BAD_REQUEST)
@@ -27,11 +27,11 @@ class UserController(
 
     @PostMapping(path=["/kyc"])
     fun updateKYC(
-        @RequestBody @Valid kycCreateRequest: KYCCreateRequestDto
+        @Valid @RequestBody kycCreateRequestDto: KYCCreateRequestDto
     ): ResponseEntity<KYCCreateRequestDto> {
         return try {
-            kycService.createKYC(kycCreateRequest)
-            ResponseEntity(kycCreateRequest, HttpStatus.CREATED)
+            kycService.createKYC(kycCreateRequestDto)
+            ResponseEntity(kycCreateRequestDto, HttpStatus.CREATED)
         }  catch (e: Exception) {
             ResponseEntity(null, HttpStatus.BAD_REQUEST)
         }
