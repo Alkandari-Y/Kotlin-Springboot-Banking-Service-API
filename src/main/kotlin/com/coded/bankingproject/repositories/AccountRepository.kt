@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface AccountRepository: JpaRepository<AccountEntity, Long> {
-    @Query("SELECT a FROM AccountEntity a")
+    @Query("SELECT a FROM AccountEntity a WHERE a.isActive = TRUE")
     fun allAccounts(): List<AccountListItemProjection>
 
     fun findByAccountNumber(accountNumber: String): AccountEntity?
