@@ -19,7 +19,9 @@ class AccountServiceImpl(
     override fun createAccount(accountEntity: AccountEntity): AccountEntity {
         val user = accountEntity.user ?: throw IllegalArgumentException("User is required")
         val userId = user.id ?: throw IllegalArgumentException("User ID is required")
+
         val numOfCustomerAccount = accountRepository.findAllByUserId(userId)
+
         if (numOfCustomerAccount >= MAX_ACCOUNT_LIMIT) {
             throw AccountLimitException()
         }

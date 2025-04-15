@@ -1,7 +1,9 @@
 package com.coded.bankingproject.accounts
 
 import com.coded.bankingproject.accounts.dtos.*
+import com.coded.bankingproject.accounts.exceptions.AccountExceptionBase
 import com.coded.bankingproject.accounts.exceptions.AccountLimitException
+import com.coded.bankingproject.accounts.exceptions.IllegalTransferException
 import com.coded.bankingproject.domain.entities.AccountEntity
 import com.coded.bankingproject.services.AccountService
 import com.coded.bankingproject.services.TransactionService
@@ -29,12 +31,13 @@ class AccountsControllers(
     {
         val user = userService.findUserById(accountCreateRequestDto.userId)
             ?: return ResponseEntity(null, HttpStatus.BAD_REQUEST)
-
         return try {
             val account = accountService.createAccount(accountCreateRequestDto.toEntity(user))
             ResponseEntity(account, HttpStatus.CREATED)
-        } catch (e: AccountLimitException) {
+        } catch (e: AccountLimitException ) {
             ResponseEntity(e.code, HttpStatus.BAD_REQUEST)
+        } catch (e: Exception) {
+            ResponseEntity(null, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
@@ -42,9 +45,15 @@ class AccountsControllers(
     @PostMapping(path=["/transfer"])
     fun transfer(
         @Valid @RequestBody transferCreateRequestDto: TransferCreateRequestDto
-    ): ResponseEntity<UpdatedBalanceResponse> {
-        val result = transactionService.transfer(transferCreateRequestDto)
-        return ResponseEntity(result.toUpdatedBalanceResponse(), HttpStatus.OK)
+    ): ResponseEntity<Any> {
+        return try {
+            val result = transactionService.transfer(transferCreateRequestDto)
+            ResponseEntity(result.toUpdatedBalanceResponse(), HttpStatus.OK)
+        } catch (e: AccountExceptionBase) {
+            ResponseEntity(e.code, HttpStatus.BAD_REQUEST)
+        } catch (e: Exception) {
+            ResponseEntity(null, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     @PostMapping(path=["/{accountNumber}/close"])

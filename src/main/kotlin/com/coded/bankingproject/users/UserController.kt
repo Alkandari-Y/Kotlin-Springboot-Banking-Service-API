@@ -3,6 +3,7 @@ package com.coded.bankingproject.users
 import com.coded.bankingproject.services.KYCService
 import com.coded.bankingproject.services.UserService
 import com.coded.bankingproject.users.dtos.*
+import com.coded.bankingproject.users.exceptions.UserExceptionBase
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -16,12 +17,15 @@ class UserController(
 ) {
 
     @PostMapping(path=["/register"])
-    fun register(@Valid @RequestBody registerRequestDto: RegisterCreateRequestDto): ResponseEntity<Nothing> {
+    fun register(@Valid @RequestBody registerRequestDto: RegisterCreateRequestDto):
+            ResponseEntity<Any> {
         return try {
             userService.createUser(registerRequestDto.toEntity())
             ResponseEntity(null, HttpStatus.OK)
+        } catch (e: UserExceptionBase) {
+            ResponseEntity(e.code, HttpStatus.BAD_REQUEST)
         } catch (e: Exception) {
-            ResponseEntity(null, HttpStatus.BAD_REQUEST)
+            ResponseEntity(null, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 

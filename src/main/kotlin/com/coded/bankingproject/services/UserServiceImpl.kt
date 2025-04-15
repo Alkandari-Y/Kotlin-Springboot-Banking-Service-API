@@ -2,6 +2,7 @@ package com.coded.bankingproject.services
 
 import com.coded.bankingproject.domain.entities.UserEntity
 import com.coded.bankingproject.repositories.UserRepository
+import com.coded.bankingproject.users.exceptions.UserExistsException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -13,7 +14,7 @@ class UserServiceImpl(
         val usernameExists = userRepository.findByUsername(user.username)
 
         if (usernameExists != null) {
-            throw IllegalArgumentException("Username already exists")
+            throw UserExistsException("Username already exists")
         }
 
         userRepository.save(user)
