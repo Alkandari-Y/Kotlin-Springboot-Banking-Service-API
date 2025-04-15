@@ -34,8 +34,8 @@ class KYCServiceImpl(
             ?: kycRequest.toEntity(user)
 
         val currentDate = LocalDate.now()
-        val yearsOfAge = Period.between(currentDate, newKycEntity.dateOfBirth)
-        println("years of age: $yearsOfAge")
+        val yearsOfAge = Period.between(newKycEntity.dateOfBirth, currentDate).years
+        if (yearsOfAge < 18) throw IllegalArgumentException("User must be 18 or older")
 
         return kycRepository.save(newKycEntity)
     }
