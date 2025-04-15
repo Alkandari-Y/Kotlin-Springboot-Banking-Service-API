@@ -29,7 +29,9 @@ data class AccountEntity(
     val isActive: Boolean,
 
     @Column(name="account_number", unique = true)
-    val accountNumber: String = UUID.randomUUID().toString(),
+    val accountNumber: String = UUID.randomUUID().toString()
+        .replace("[A-Za-z]".toRegex(), "")
+        .replace("-", ""),
 
 
 ) {
