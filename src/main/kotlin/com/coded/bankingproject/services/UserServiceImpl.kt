@@ -10,17 +10,21 @@ import org.springframework.stereotype.Service
 class UserServiceImpl(
     private val userRepository: UserRepository
 ): UserService {
-    override fun createUser(user: UserEntity) {
+    override fun createUser(user: UserEntity): UserEntity {
         val usernameExists = userRepository.findByUsername(user.username)
 
         if (usernameExists != null) {
             throw UserExistsException("Username already exists")
         }
 
-        userRepository.save(user)
+        return userRepository.save(user)
     }
 
     override fun findUserById(userId: Long): UserEntity? {
         return userRepository.findByIdOrNull(userId)
+    }
+
+    override fun findUserByUsername(username: String): UserEntity? {
+        return userRepository.findByUsername(username)
     }
 }
