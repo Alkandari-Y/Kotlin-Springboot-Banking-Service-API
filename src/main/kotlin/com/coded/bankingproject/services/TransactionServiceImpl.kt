@@ -6,10 +6,12 @@ import com.coded.bankingproject.accounts.exceptions.AccountNotFoundException
 import com.coded.bankingproject.accounts.exceptions.IllegalTransferException
 import com.coded.bankingproject.accounts.exceptions.InsufficientFundsException
 import com.coded.bankingproject.domain.entities.TransactionEntity
+import com.coded.bankingproject.domain.entities.UserEntity
 import com.coded.bankingproject.repositories.AccountRepository
 import com.coded.bankingproject.repositories.TransactionRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
+import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 
 @Service
@@ -19,7 +21,7 @@ class TransactionServiceImpl(
 ): TransactionService {
 
     @Transactional
-    override fun transfer(newTransaction: TransferCreateRequestDto): TransactionResultDto {
+    override fun transfer(newTransaction: TransferCreateRequestDto, userMakingTransfer: UserEntity): TransactionResultDto {
         if (newTransaction.sourceAccountNumber == newTransaction.destinationAccountNumber) {
             throw IllegalTransferException("Cannot transfer to the same account.")
         }
@@ -33,6 +35,10 @@ class TransactionServiceImpl(
 
         if (sourceAccount.isActive.not() || destinationAccount.isActive.not()) {
             throw IllegalTransferException("Cannot transfer with inactive account.")
+        }
+
+        if (sourceAccount.user != userMakingTransfer) {
+            throw IllegalArgumentException("Cannot transfer with another persons account.")
         }
 
         val newSourceBalance = sourceAccount.balance - newTransaction.amount

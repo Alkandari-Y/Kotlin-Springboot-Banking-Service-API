@@ -9,8 +9,6 @@ import java.math.BigDecimal
 
 data class AccountCreateRequestDto(
     @field:NotNull
-    val userId: Long,
-    @field:NotNull
     @field:DecimalMin(
         value = "100.00",
         inclusive = true,

@@ -14,6 +14,9 @@ interface AccountRepository: JpaRepository<AccountEntity, Long> {
 
     fun findByAccountNumber(accountNumber: String): AccountEntity?
 
-    @Query("SELECT COUNT(a) FROM AccountEntity a WHERE a.user.id = :userId")
-    fun findAllByUserId(@Param("userId") userId: Long): Int
+    @Query("SELECT a FROM AccountEntity a WHERE a.user.id = :userId AND a.isActive = TRUE")
+    fun findByUserId(@Param("userId") userId: Long): List<AccountListItemProjection>
+
+    @Query("SELECT COUNT(a) FROM AccountEntity a WHERE a.user.id = :userId AND a.isActive = TRUE")
+    fun getAccountCountByUserId(@Param("userId") userId: Long): Long
 }
