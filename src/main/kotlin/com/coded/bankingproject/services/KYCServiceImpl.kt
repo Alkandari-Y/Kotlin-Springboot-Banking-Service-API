@@ -1,13 +1,14 @@
 package com.coded.bankingproject.services
 
+import com.coded.bankingproject.accounts.exceptions.AccountVerificationException
 import com.coded.bankingproject.domain.entities.KYCEntity
+import com.coded.bankingproject.domain.entities.UserEntity
+import com.coded.bankingproject.errors.ErrorCode
 import com.coded.bankingproject.repositories.KYCRepository
-import com.coded.bankingproject.repositories.UserRepository
 import com.coded.bankingproject.repositories.kycDateFormatter
 import com.coded.bankingproject.users.dtos.KYCCreateRequestDto
 import com.coded.bankingproject.users.dtos.KYCResponseDto
 import com.coded.bankingproject.users.dtos.toEntity
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.Period
@@ -15,12 +16,12 @@ import java.time.Period
 @Service
 class KYCServiceImpl(
     private val kycRepository: KYCRepository,
-    private val userRepository: UserRepository
 ): KYCService {
-    override fun createKYCOrUpdate(kycRequest: KYCCreateRequestDto): KYCEntity {
-        val user = userRepository.findByIdOrNull(kycRequest.userId)
-            ?: throw IllegalArgumentException("User does not exists")
 
+    override fun createKYCOrUpdate(
+        kycRequest: KYCCreateRequestDto,
+        user: UserEntity
+    ): KYCEntity {
         val existingKYC = kycRepository.findKYCEntityByUserId(user.id!!)
 
         val newKycEntity  = existingKYC?.copy(
@@ -35,7 +36,7 @@ class KYCServiceImpl(
 
         val currentDate = LocalDate.now()
         val yearsOfAge = Period.between(newKycEntity.dateOfBirth, currentDate).years
-        if (yearsOfAge < 18) throw IllegalArgumentException("User must be 18 or older")
+        if (yearsOfAge < 18) throw AccountVerificationException(message = "User must be 18 or older", code = ErrorCode.INVALID_AGE)
 
         return kycRepository.save(newKycEntity)
     }

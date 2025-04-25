@@ -2,6 +2,10 @@ package com.coded.bankingproject.domain.entities
 
 import jakarta.persistence.*
 
+enum class Role {
+    USER, ADMIN
+}
+
 @Entity
 @Table(name = "users")
 data class UserEntity(
@@ -16,6 +20,8 @@ data class UserEntity(
     @Column(name = "password", nullable = false, updatable = true)
     val password: String,
 
+    @Column(name = "role", nullable = false)
+    val role: Role = Role.USER,
 ) {
-    constructor() : this(null, "", "")
+    constructor() : this(null, "", "", Role.USER)
 }

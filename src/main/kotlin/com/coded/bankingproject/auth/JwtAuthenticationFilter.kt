@@ -1,5 +1,6 @@
 package com.coded.bankingproject.auth
 
+import com.coded.bankingproject.domain.entities.AuthUserDetails
 import com.coded.bankingproject.services.JwtService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.*
@@ -32,7 +33,7 @@ class JwtAuthenticationFilter(
 
         if (SecurityContextHolder.getContext().authentication == null) {
             if (jwtService.isTokenValid(token, username)) {
-                val userDetails = userDetailsService.loadUserByUsername(username)
+                val userDetails = userDetailsService.loadUserByUsername(username) as AuthUserDetails
                 val authToken = UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.authorities
                 )

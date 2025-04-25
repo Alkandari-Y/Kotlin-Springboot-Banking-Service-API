@@ -1,6 +1,7 @@
 package com.coded.bankingproject.services
 
 import com.coded.bankingproject.accounts.exceptions.AccountLimitException
+import com.coded.bankingproject.accounts.exceptions.AccountVerificationException
 import com.coded.bankingproject.domain.entities.AccountEntity
 import com.coded.bankingproject.domain.entities.UserEntity
 import com.coded.bankingproject.domain.projections.AccountListItemProjection
@@ -36,7 +37,7 @@ class AccountServiceImpl(
     override fun closeAccount(accountNumber: String, user: UserEntity) {
         accountRepository.findByAccountNumber(accountNumber)?.apply {
             if (this.user != user) {
-                throw IllegalArgumentException("Only owners can close accounts")
+                throw AccountVerificationException("Only owners can close accounts")
             }
             if (this.isActive) {
                 accountRepository.save(this.copy(isActive = false))

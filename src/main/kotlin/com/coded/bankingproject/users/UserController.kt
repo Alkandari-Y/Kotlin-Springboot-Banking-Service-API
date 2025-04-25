@@ -1,6 +1,8 @@
 package com.coded.bankingproject.users
 
 import com.coded.bankingproject.auth.dtos.JwtResponseDto
+import com.coded.bankingproject.domain.entities.AuthUserDetails
+import com.coded.bankingproject.domain.entities.toUserEntity
 import com.coded.bankingproject.services.JwtService
 import com.coded.bankingproject.services.KYCService
 import com.coded.bankingproject.services.UserService
@@ -10,8 +12,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -27,8 +28,9 @@ class UserController(
     private val jwtService: JwtService,
     private val passwordEncoder: PasswordEncoder,
 ) {
-    @PostMapping(path=["/register"])
-    fun register(@Valid @RequestBody user: RegisterCreateRequestDto
+    @PostMapping(path = ["/register"])
+    fun register(
+        @Valid @RequestBody user: RegisterCreateRequestDto
     ): ResponseEntity<JwtResponseDto> {
         val userEntity = userService.createUser(
             user.copy(
@@ -37,7 +39,7 @@ class UserController(
                 )
             ).toEntity()
         )
-        val token = jwtService.generateToken(userEntity.username)
+        val token = jwtService.generateToken(userEntity)
         return ResponseEntity(JwtResponseDto(token), HttpStatus.OK)
     }
 
@@ -53,41 +55,30 @@ class UserController(
             throw UsernameNotFoundException("Invalid credentials")
         }
 
-        val userDetails = userDetailsService.loadUserByUsername(loginRequestDto.username)
-        val token = jwtService.generateToken(userDetails.username)
+        val userDetails = userDetailsService.loadUserByUsername(loginRequestDto.username) as AuthUserDetails
+        val token = jwtService.generateToken(userDetails.toUserEntity())
         return ResponseEntity(JwtResponseDto(token), HttpStatus.OK)
     }
 
-    @PostMapping(path=["/kyc"])
+    @PostMapping(path = ["/kyc"])
     fun updateKYC(
         @Valid @RequestBody kycCreateRequestDto: KYCCreateRequestDto,
-            authentication: Authentication,
+        @AuthenticationPrincipal user: AuthUserDetails
     ): ResponseEntity<KYCCreateRequestDto> {
+        val authUser = user.toUserEntity()
         return try {
-
-            // change me later
-            // make this implementation cleaner
-            // multiple calls for user
-            // modify the UserDetails to have the id
-            val userDetails = authentication.principal as UserDetails
-            val userEntity = userService.findUserById(kycCreateRequestDto.userId)
-            kycService.createKYCOrUpdate(kycCreateRequestDto)
+            kycService.createKYCOrUpdate(kycCreateRequestDto, authUser)
             ResponseEntity(kycCreateRequestDto, HttpStatus.CREATED)
-        }  catch (e: Exception) {
+        } catch (e: Exception) {
             ResponseEntity(null, HttpStatus.BAD_REQUEST)
         }
     }
 
-    @GetMapping(path=["/kyc"])
+    @GetMapping(path = ["/kyc"])
     fun getKYCByUserId(
-//        @PathVariable("userId") userId: Long
-        authentication: Authentication,
-        ): ResponseEntity<KYCResponseDto> {
-        val userDetails = authentication.principal as UserDetails
-        val userId = userService.findUserByUsername(userDetails.username)?.id
-            ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-
-        val kyc = kycService.findKYCByUserId(userId)
+        @AuthenticationPrincipal user: AuthUserDetails
+    ): ResponseEntity<KYCResponseDto> {
+        val kyc = kycService.findKYCByUserId(user.userId)
             ?: return ResponseEntity(HttpStatus.NOT_FOUND)
         return ResponseEntity(kyc, HttpStatus.OK)
     }

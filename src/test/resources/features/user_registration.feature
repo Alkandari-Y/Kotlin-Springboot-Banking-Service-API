@@ -5,7 +5,7 @@ Feature: User Registration
     When user makes a "POST" request to "/users/v1/register" with body
       """json
       {
-        "username": "Sultan",
+        "username": "admin",
         "password": "someta1hingSecret"
       }
       """

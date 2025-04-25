@@ -12,9 +12,6 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 data class KYCCreateRequestDto(
-    @field:NotNull
-    @field:Positive
-    val userId: Long,
     @field:NotBlank
     val firstName: String,
     @field:NotBlank

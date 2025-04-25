@@ -3,10 +3,11 @@ package com.coded.bankingproject.services
 import com.coded.bankingproject.accounts.dtos.TransactionResultDto
 import com.coded.bankingproject.accounts.dtos.TransferCreateRequestDto
 import com.coded.bankingproject.accounts.exceptions.AccountNotFoundException
-import com.coded.bankingproject.accounts.exceptions.IllegalTransferException
+import com.coded.bankingproject.accounts.exceptions.InvalidTransferException
 import com.coded.bankingproject.accounts.exceptions.InsufficientFundsException
 import com.coded.bankingproject.domain.entities.TransactionEntity
 import com.coded.bankingproject.domain.entities.UserEntity
+import com.coded.bankingproject.errors.ErrorCode
 import com.coded.bankingproject.repositories.AccountRepository
 import com.coded.bankingproject.repositories.TransactionRepository
 import jakarta.transaction.Transactional
@@ -23,7 +24,7 @@ class TransactionServiceImpl(
     @Transactional
     override fun transfer(newTransaction: TransferCreateRequestDto, userMakingTransfer: UserEntity): TransactionResultDto {
         if (newTransaction.sourceAccountNumber == newTransaction.destinationAccountNumber) {
-            throw IllegalTransferException("Cannot transfer to the same account.")
+            throw InvalidTransferException(message="Cannot transfer to the same account.",  code = ErrorCode.INVALID_TRANSFER)
         }
 
         val sourceAccount = accountRepository.findByAccountNumber(newTransaction.sourceAccountNumber)
@@ -34,11 +35,11 @@ class TransactionServiceImpl(
         }
 
         if (sourceAccount.isActive.not() || destinationAccount.isActive.not()) {
-            throw IllegalTransferException("Cannot transfer with inactive account.")
+            throw InvalidTransferException("Cannot transfer with inactive account.",  code = ErrorCode.INVALID_ACCOUNT_TYPE)
         }
 
         if (sourceAccount.user != userMakingTransfer) {
-            throw IllegalArgumentException("Cannot transfer with another persons account.")
+            throw InvalidTransferException("Cannot transfer with another persons account.", code = ErrorCode.INVALID_TRANSFER)
         }
 
         val newSourceBalance = sourceAccount.balance - newTransaction.amount
