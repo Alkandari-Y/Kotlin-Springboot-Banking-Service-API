@@ -30,7 +30,8 @@ class KYCServiceImpl(
             dateOfBirth= kycRequest.dateOfBirth.let {
                 LocalDate.parse(kycRequest.dateOfBirth, kycDateFormatter)
             },
-            nationality= kycRequest.nationality
+            nationality= kycRequest.nationality,
+            salary= kycRequest.salary,
         )
             ?: kycRequest.toEntity(user)
 

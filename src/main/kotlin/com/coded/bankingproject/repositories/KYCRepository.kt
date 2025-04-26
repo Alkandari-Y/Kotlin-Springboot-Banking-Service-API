@@ -16,7 +16,7 @@ interface KYCRepository: JpaRepository<KYCEntity, Long> {
 
     @Query("""
     SELECT new com.coded.bankingproject.users.dtos.KYCResponseDto(
-        k.user.id, k.firstName, k.lastName, k.dateOfBirth, k.salary
+        k.id, k.user.id, k.firstName, k.lastName, k.dateOfBirth, k.salary, k.nationality
     )
     FROM KYCEntity k
     WHERE k.user.id = :userId

@@ -5,6 +5,8 @@ import com.coded.bankingproject.errors.ErrorCode
 import com.coded.bankingproject.errors.ErrorResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
@@ -41,6 +43,24 @@ class GlobalExceptionHandler {
             error = status.reasonPhrase,
             message = ex.message ?: "Unexpected error occurred",
             code = ErrorCode.INTERNAL_SERVER_ERROR.name,
+            path = request.getDescription(false).removePrefix("uri=")
+        )
+        return ResponseEntity.status(status).body(errorResponse)
+    }
+
+    @ExceptionHandler(UsernameNotFoundException::class, BadCredentialsException::class)
+    fun handleUsernameNotFoundException(
+        ex: UsernameNotFoundException,
+        request: WebRequest
+    ): ResponseEntity<ErrorResponse> {
+        println("----[!!] in the handler")
+        val status = HttpStatus.NOT_FOUND
+        val errorResponse = ErrorResponse(
+            timestamp = Instant.now().toString(),
+            status = status.value(),
+            error = status.reasonPhrase,
+            message = "Invalid Credentials",
+            code = ErrorCode.USER_NOT_FOUND.name,
             path = request.getDescription(false).removePrefix("uri=")
         )
         return ResponseEntity.status(status).body(errorResponse)

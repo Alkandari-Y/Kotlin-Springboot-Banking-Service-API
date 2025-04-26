@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
@@ -24,7 +23,6 @@ class UserController(
     private val userService: UserService,
     private val kycService: KYCService,
     private val authenticationManager: AuthenticationProvider,
-    private val userDetailsService: UserDetailsService,
     private val jwtService: JwtService,
     private val passwordEncoder: PasswordEncoder,
 ) {
@@ -44,18 +42,18 @@ class UserController(
     }
 
     @PostMapping(path = ["/login"])
-    fun login(@Valid @RequestBody loginRequestDto: LoginRequestDto): ResponseEntity<*> {
+    fun login(
+        @Valid @RequestBody loginRequestDto: LoginRequestDto
+    ): ResponseEntity<JwtResponseDto> {
         val authToken = UsernamePasswordAuthenticationToken(
             loginRequestDto.username,
             loginRequestDto.password
         )
-        val authenticated = authenticationManager.authenticate(authToken)
 
-        if (authenticated.isAuthenticated.not()) {
-            throw UsernameNotFoundException("Invalid credentials")
-        }
+        val authentication = authenticationManager.authenticate(authToken)
+        val userDetails = authentication.principal as? AuthUserDetails
+            ?: throw UsernameNotFoundException("User not found")
 
-        val userDetails = userDetailsService.loadUserByUsername(loginRequestDto.username) as AuthUserDetails
         val token = jwtService.generateToken(userDetails.toUserEntity())
         return ResponseEntity(JwtResponseDto(token), HttpStatus.OK)
     }
@@ -64,14 +62,13 @@ class UserController(
     fun updateKYC(
         @Valid @RequestBody kycCreateRequestDto: KYCCreateRequestDto,
         @AuthenticationPrincipal user: AuthUserDetails
-    ): ResponseEntity<KYCCreateRequestDto> {
+    ): ResponseEntity<KYCResponseDto> {
         val authUser = user.toUserEntity()
-        return try {
-            kycService.createKYCOrUpdate(kycCreateRequestDto, authUser)
-            ResponseEntity(kycCreateRequestDto, HttpStatus.CREATED)
-        } catch (e: Exception) {
-            ResponseEntity(null, HttpStatus.BAD_REQUEST)
-        }
+        val kyc = kycService.createKYCOrUpdate(
+            kycCreateRequestDto,
+            authUser
+        )
+        return ResponseEntity(kyc.toKYCResponseDto(authUser.id!!), HttpStatus.CREATED)
     }
 
     @GetMapping(path = ["/kyc"])
