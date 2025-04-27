@@ -3,12 +3,10 @@ package com.coded.bankingproject.cucumber.steps
 import com.coded.bankingproject.cucumber.testcontext.TestContext
 import com.coded.bankingproject.cucumber.testutils.ApiRequestHelper
 import com.coded.bankingproject.domain.entities.AccountEntity
-import com.coded.bankingproject.domain.entities.TransactionEntity
 import com.coded.bankingproject.domain.entities.UserEntity
 import com.coded.bankingproject.repositories.AccountRepository
 import com.coded.bankingproject.repositories.TransactionRepository
 import com.coded.bankingproject.repositories.UserRepository
-import com.coded.bankingproject.services.JwtService
 import io.cucumber.java.en.And
 import io.cucumber.java.en.When
 import org.json.JSONArray
@@ -27,9 +25,6 @@ class AccountTransferSteps {
     lateinit var testContext: TestContext
 
     @Autowired
-    lateinit var jwtService: JwtService
-
-    @Autowired
     lateinit var transactionRepository: TransactionRepository
 
     @Autowired
@@ -41,7 +36,6 @@ class AccountTransferSteps {
     private var userInitiatingTransaction: UserEntity? = null
     private var sourceAccount: AccountEntity? = null
     private var destinationAccount: AccountEntity? = null
-    private var transactionEntity: TransactionEntity? = null
 
 
     @When("user makes a transfer of {double}")
@@ -99,7 +93,7 @@ class AccountTransferSteps {
         val user = userRepository.findByUsername(username)!!
         val account = AccountEntity(
             name = accountName,
-            balance = BigDecimal.valueOf(balance),
+            balance = BigDecimal.valueOf(balance).setScale(3),
             user = user,
             isActive = true
         )
@@ -159,53 +153,55 @@ class AccountTransferSteps {
 
     @And("the source account balance decreases by {double}")
     fun sourceAccountBalanceDecreases(amount: Double) {
-        val differenceAmount = BigDecimal.valueOf(amount)
+        val amountTransferred = BigDecimal.valueOf(amount).setScale(3)
+
         val jsonRequestBodyAmount = JSONObject(testContext.requestBody).getDouble("amount")
         assertNotNull(jsonRequestBodyAmount)
+        val requestAmount = BigDecimal.valueOf(jsonRequestBodyAmount).setScale(3)
 
-        val amountTransferred = BigDecimal.valueOf(jsonRequestBodyAmount)
+        assertEquals(0, amountTransferred.compareTo(requestAmount))
 
         val jsonResponse = JSONObject(testContext.response?.body)
-        println(jsonResponse)
         assertTrue(jsonResponse.has("newBalance"))
-
         val jsonResponseNewBalance = jsonResponse.getDouble("newBalance")
         assertNotNull(jsonResponseNewBalance)
-        val newBalanceResponse = BigDecimal.valueOf(jsonResponseNewBalance)
+        val newBalanceResponse = BigDecimal.valueOf(jsonResponseNewBalance).setScale(3)
 
         val updatedAccountEntity = accountRepository.findByAccountNumber(sourceAccount?.accountNumber!!)!!
         assertNotNull(updatedAccountEntity)
 
         val expectedNewBalance = sourceAccount?.balance?.subtract(amountTransferred)
-        assertEquals(0, sourceAccount?.balance?.subtract(differenceAmount)
-            ?.compareTo(updatedAccountEntity.balance))
+
         assertEquals(0, expectedNewBalance?.compareTo(updatedAccountEntity.balance))
-        assertEquals(0, newBalanceResponse.compareTo(updatedAccountEntity.balance))
+        assertEquals(0, expectedNewBalance?.compareTo(newBalanceResponse))
+        assertEquals(0, updatedAccountEntity.balance.compareTo(newBalanceResponse))
     }
+
 
     @And("the destination account balance increases by {double}")
     fun destinationAccountBalanceIncreases(amount: Double) {
-        val differenceAmount = BigDecimal.valueOf(amount)
-
-        val jsonRequestBodyAmount = JSONObject(testContext.requestBody).getDouble("amount")
-        assertNotNull(jsonRequestBodyAmount)
-
-        val amountTransferred = BigDecimal.valueOf(jsonRequestBodyAmount)
+        val jsonResponse = JSONObject(testContext.response?.body)
+        assertTrue(jsonResponse.has("newBalance"))
 
         val updatedDestinationAccountEntity = accountRepository.findByAccountNumber(destinationAccount?.accountNumber!!)!!
         assertNotNull(updatedDestinationAccountEntity)
 
-        val expectedNewBalance = destinationAccount?.balance?.add(amountTransferred)
+        val balanceFromDatabase = updatedDestinationAccountEntity.balance.setScale(3)
+        val initialBalance = destinationAccount?.balance?.setScale(3)
 
-        assertEquals(0, destinationAccount?.balance?.add(differenceAmount)
-            ?.compareTo(updatedDestinationAccountEntity.balance))
-        assertEquals(0, expectedNewBalance?.compareTo(updatedDestinationAccountEntity.balance))
+        val amountTransferred = BigDecimal.valueOf(amount).setScale(3)
+
+        val expectedNewBalance = initialBalance?.add(amountTransferred)
+
+        assertEquals(0, expectedNewBalance?.compareTo(balanceFromDatabase))
     }
+
 
     @And("the account {string} is marked as inactive in the database")
     fun accountIsMarkedAsInactive(accountName: String) {
         val account = accountRepository.findByAccountNumber(testContext.accountNumber)
         assertNotNull(account)
+        assertEquals(accountName, account?.name)
         assertFalse(account!!.isActive)
     }
 
@@ -213,6 +209,27 @@ class AccountTransferSteps {
     fun accountIsMarkedAsActive(accountName: String) {
         val account = accountRepository.findByAccountNumber(testContext.accountNumber)
         assertNotNull(account)
+        assertEquals(accountName, account?.name)
         assertTrue(account!!.isActive)
+    }
+
+    @And("the database does not contain the failed transaction")
+    fun databaseDoesNotContainFailedTransactions() {
+        val transactions = transactionRepository.findBySourceAccountId(sourceAccount?.id!!)
+        assertNotNull(transactions)
+        assertEquals(0, transactions.count())
+    }
+
+    @And("the database has a transaction for the source account id and destination account id with {double} amount")
+    fun databaseHasSuccessfulTransaction(amount: Double) {
+        val amountBigDecimal = BigDecimal.valueOf(amount).setScale(3)
+        val transactions = transactionRepository.findBySourceAccountId(sourceAccount?.id!!)
+        assertNotNull(transactions)
+        assertEquals(1, transactions.count())
+        val transaction = transactions.first()
+        assertNotNull(transaction)
+        assertEquals(0, amountBigDecimal.compareTo(transaction.amount))
+        assertEquals(sourceAccount?.id, transaction.sourceAccount?.id)
+        assertEquals(destinationAccount?.id, transaction.destinationAccount?.id)
     }
 }

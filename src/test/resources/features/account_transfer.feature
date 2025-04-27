@@ -54,11 +54,13 @@ Feature: Account Management and Money Transfers
   Scenario: Successful money transfer between two accounts
     Given user "transferuser" with password "ValidPass1" exists
     And "transferuser" has an active source account "transferuser Source Account" with balance 500.00
-    And "transferuser" has an active destination account "transferuser Destination Account" with balance 100.00
-    When user makes a transfer of 200.50
+    And "transferuser" has an active destination account "transferuser Destination Account" with balance 500.00
+    When user makes a transfer of 200.53
     Then the response status code is 200
-    And the source account balance decreases by 200.50
-    And the destination account balance increases by 200.50
+    And the source account balance decreases by 200.53
+    And the destination account balance increases by 200.53
+    And the database has a transaction for the source account id and destination account id with 200.53 amount
+
 
   Scenario: Cannot transfer to the same account
     Given user "selftransferuser" with password "ValidPass1" exists
@@ -66,6 +68,7 @@ Feature: Account Management and Money Transfers
     When user makes a transfer of 50 to same account
     Then the response status code is 400
     And the error message is "Cannot transfer to the same account."
+    And the database does not contain the failed transaction
 
   Scenario: Cannot transfer with insufficient funds
     Given user "owneruser" with password "ValidPass1" exists
@@ -75,6 +78,7 @@ Feature: Account Management and Money Transfers
     When user makes a transfer of 100
     Then the response status code is 400
     And the error message is "Transfer would result in a negative balance."
+    And the database does not contain the failed transaction
 
   Scenario: Cannot transfer from an account the user does not own
     Given user "victims" with password "ValidPass1" exists
@@ -84,6 +88,7 @@ Feature: Account Management and Money Transfers
     When user makes a transfer of 10000
     Then the response status code is 400
     And the error message is "Cannot transfer with another persons account."
+    And the database does not contain the failed transaction
 
   Scenario: User cannot close someone else's account
     Given user "victimuser" with password "ValidPass1" exists
@@ -104,5 +109,6 @@ Feature: Account Management and Money Transfers
     Then the response status code is 400
     And the error message is "Validation failed"
     And the field "amount" has validation error "amount must must be at least 1.00"
+    And the database does not contain the failed transaction
 
 

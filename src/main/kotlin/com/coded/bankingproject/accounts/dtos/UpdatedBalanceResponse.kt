@@ -7,5 +7,5 @@ data class UpdatedBalanceResponse(
 )
 
 fun TransactionResultDto.toUpdatedBalanceResponse() = UpdatedBalanceResponse(
-    newBalance = this.sourceAccount.balance
+    newBalance = this.sourceAccount.balance.setScale(3)
 )

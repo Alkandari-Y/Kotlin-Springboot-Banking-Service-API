@@ -23,7 +23,7 @@ fun AccountCreateRequestDto.toEntity(user: UserEntity): AccountEntity {
     return AccountEntity(
         name=name,
         user = user,
-        balance = initialBalance,
+        balance = initialBalance.setScale(3),
         isActive = true
     )
 }

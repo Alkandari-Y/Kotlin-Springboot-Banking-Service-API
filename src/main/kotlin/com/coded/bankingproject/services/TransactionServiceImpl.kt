@@ -42,8 +42,8 @@ class TransactionServiceImpl(
             throw InvalidTransferException("Cannot transfer with another persons account.", code = ErrorCode.INVALID_TRANSFER)
         }
 
-        val newSourceBalance = sourceAccount.balance - newTransaction.amount
-        val newDestinationBalance = destinationAccount.balance + newTransaction.amount
+        val newSourceBalance = sourceAccount.balance.setScale(3).subtract(newTransaction.amount)
+        val newDestinationBalance = destinationAccount.balance.setScale(3).add(newTransaction.amount)
 
         if (newSourceBalance < BigDecimal.ZERO) {
             throw InsufficientFundsException("Transfer would result in a negative balance.")
@@ -53,7 +53,7 @@ class TransactionServiceImpl(
             TransactionEntity(
                 sourceAccount=sourceAccount,
                 destinationAccount=destinationAccount,
-                amount = newTransaction.amount,
+                amount = newTransaction.amount.setScale(3),
             )
         )
 

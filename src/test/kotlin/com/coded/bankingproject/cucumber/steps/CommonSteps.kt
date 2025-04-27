@@ -89,7 +89,6 @@ class CommonSteps @Autowired constructor(
 
     @Then("the response status code is {int}")
     fun responseStatusCodeIs(expectedStatus: Int) {
-        println("Response body: ${testContext.response?.body}")
         assertEquals(expectedStatus, testContext.response?.statusCode?.value())
     }
 
