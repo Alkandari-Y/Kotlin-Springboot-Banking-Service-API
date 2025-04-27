@@ -23,4 +23,5 @@ interface KYCRepository: JpaRepository<KYCEntity, Long> {
 """)
     fun findKYCByUserId(@Param("userId") userId: Long): KYCResponseDto?
 
+    fun findAllByUserId(userId: Long): List<KYCEntity>
 }
