@@ -151,9 +151,9 @@ class AccountTransferSteps {
         assertTrue(jsonArray.length() > 0)
     }
 
-    @And("the source account balance decreases by {double}")
-    fun sourceAccountBalanceDecreases(amount: Double) {
-        val amountTransferred = BigDecimal.valueOf(amount).setScale(3)
+    @And("the source account balance decreases by {string}")
+    fun sourceAccountBalanceDecreases(amount: String) {
+        val amountTransferred = BigDecimal(amount).setScale(3)
 
         val jsonRequestBodyAmount = JSONObject(testContext.requestBody).getDouble("amount")
         assertNotNull(jsonRequestBodyAmount)
@@ -172,14 +172,15 @@ class AccountTransferSteps {
 
         val expectedNewBalance = sourceAccount?.balance?.subtract(amountTransferred)
 
+
         assertEquals(0, expectedNewBalance?.compareTo(updatedAccountEntity.balance))
         assertEquals(0, expectedNewBalance?.compareTo(newBalanceResponse))
         assertEquals(0, updatedAccountEntity.balance.compareTo(newBalanceResponse))
     }
 
 
-    @And("the destination account balance increases by {double}")
-    fun destinationAccountBalanceIncreases(amount: Double) {
+    @And("the destination account balance increases by {string}")
+    fun destinationAccountBalanceIncreases(amount: String) {
         val jsonResponse = JSONObject(testContext.response?.body)
         assertTrue(jsonResponse.has("newBalance"))
 
@@ -189,7 +190,7 @@ class AccountTransferSteps {
         val balanceFromDatabase = updatedDestinationAccountEntity.balance.setScale(3)
         val initialBalance = destinationAccount?.balance?.setScale(3)
 
-        val amountTransferred = BigDecimal.valueOf(amount).setScale(3)
+        val amountTransferred = BigDecimal(amount).setScale(3)
 
         val expectedNewBalance = initialBalance?.add(amountTransferred)
 

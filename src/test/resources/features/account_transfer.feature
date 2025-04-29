@@ -55,11 +55,11 @@ Feature: Account Management and Money Transfers
     Given user "transferuser" with password "ValidPass1" exists
     And "transferuser" has an active source account "transferuser Source Account" with balance 500.00
     And "transferuser" has an active destination account "transferuser Destination Account" with balance 500.00
-    When user makes a transfer of 200.53
+    When user makes a transfer of 200.532
     Then the response status code is 200
-    And the source account balance decreases by 200.53
-    And the destination account balance increases by 200.53
-    And the database has a transaction for the source account id and destination account id with 200.53 amount
+    And the source account balance decreases by "200.532"
+    And the destination account balance increases by "200.532"
+    And the database has a transaction for the source account id and destination account id with 200.532 amount
 
 
   Scenario: Cannot transfer to the same account
